@@ -1,8 +1,8 @@
 {
   "id": "averis-highest-dmg",
   "title": "Averis | Highest DMG",
-  "description": "A manual, GM-managed Highest Damage leaderboard for your campaign. Foundry VTT V14.",
-  "version": "1.0.0",
+  "description": "Averis manual Highest DMG leaderboard with a sidebar shortcut for everyone; GM-only record management.",
+  "version": "1.1.0",
   "authors": [
     {
       "name": "Daikaze"
