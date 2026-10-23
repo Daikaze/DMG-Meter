@@ -59,10 +59,11 @@ jobs:
           cat > /tmp/release-notes.md <<'NOTES'
           ## Averis Highest DMG
 
-          - Highest single-hit damage leaderboard for Foundry V14 / D&D 5e.
+          - Highest single-hit damage leaderboard for Foundry V11 / D&D 5e.
           - GM can add, edit and delete records; players have a read-only view.
           - Open directly from the left-side Scene Controls trophy button.
           - Custom token art: browse files, use token art or character portrait, preview images before saving.
+          - Foundry V11 Application window, FilePicker, Dialog and scene control compatibility.
           - Existing records and their artwork remain saved in world settings.
 
           ### Install
