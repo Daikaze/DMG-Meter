@@ -1,0 +1,30 @@
+{
+  "id": "averis-highest-dmg",
+  "title": "Averis | Highest DMG",
+  "description": "A manual, GM-managed Highest Damage leaderboard for your campaign. Foundry VTT V14.",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Daikaze"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "esmodules": [
+    "scripts/highest-dmg.js"
+  ],
+  "styles": [
+    "styles/highest-dmg.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "manifest": "https://raw.githubusercontent.com/Daikaze/DMG-Meter/main/module.json",
+  "download": "https://github.com/Daikaze/DMG-Meter/archive/refs/heads/main.zip"
+}
