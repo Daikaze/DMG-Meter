@@ -97,3 +97,66 @@
   .averis-hdmg__rank { flex-basis:20px; }
   .averis-hdmg__avatar { width:29px; height:29px; flex-basis:29px; }
 }
+
+/* Character artwork chooser: visible only within the GM Record Manager. */
+.averis-hdmg__art-editor {
+  display: grid;
+  grid-template-columns: 95px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  border-top: 1px solid #3b3b47;
+  padding-top: 15px;
+  margin-top: 16px;
+}
+.averis-hdmg__art-preview {
+  display: grid;
+  place-items: center;
+  width: 95px;
+  height: 95px;
+  border-radius: 12px;
+  border: 1px solid #8b693e;
+  background: radial-gradient(circle at center,#443827,#191a27);
+  overflow: hidden;
+}
+.averis-hdmg__art-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.averis-hdmg__art-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #bca57d;
+  font-size: 30px;
+}
+.averis-hdmg__art-preview [hidden] { display: none !important; }
+.averis-hdmg__art-options { display: flex; flex-direction: column; min-width: 0; gap: 8px; }
+.averis-hdmg__art-options label { color: #cdc5cd; font-size: 11px; font-weight: 600; }
+.averis-hdmg__art-options label em { color:#9993a3; font-weight: 400; font-style: normal; }
+.averis-hdmg__art-options input {
+  width: 100%;
+  min-width: 0;
+  height: 37px;
+  padding: 9px 10px;
+  color: #f8f1ea;
+  background: #11141e;
+  border: 1px solid #55515f;
+  border-radius: 7px;
+  font-size: 12px;
+  box-shadow: none;
+}
+.averis-hdmg__art-options input:focus { border-color: #d8ab6a; outline: 1px solid #d8ab6a; }
+.averis-hdmg__art-options input::placeholder { color: #847e8b; }
+.averis-hdmg__art-buttons { display:flex; flex-wrap:wrap; gap:7px; }
+.averis-hdmg__art-buttons .averis-hdmg__button--art { padding: 8px 10px; font-size:11px; }
+.averis-hdmg__art-buttons .averis-hdmg__button--clear { color: #e6aaa7; }
+.averis-hdmg__art-help { color: #aba5b2; font-size: 10px; line-height: 1.4; margin: 0 !important; }
+.averis-hdmg__hero-art { width: 70px; height: 70px; flex: 0 0 70px; object-fit:cover; }
+.averis-hdmg__avatar { border-radius:50%; }
+@media (max-width: 440px) {
+  .averis-hdmg__art-editor { grid-template-columns: 1fr; }
+  .averis-hdmg__art-preview { width: 90px; height: 90px; }
+}
