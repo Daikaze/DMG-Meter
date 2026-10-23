@@ -1,8 +1,8 @@
 {
   "id": "averis-highest-dmg",
   "title": "Averis | Highest DMG",
-  "description": "Manual Highest DMG Hall of Fame with a clickable Foundry V14 scene-control trophy button for all players; GM-only editing.",
-  "version": "1.2.0",
+  "description": "Averis Highest DMG leaderboard for Foundry V14, with token artwork selection, custom art browsing, a scene-control shortcut, and GM-only editing.",
+  "version": "1.3.0",
   "authors": [
     {
       "name": "Daikaze"
