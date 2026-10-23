@@ -384,6 +384,15 @@ Hooks.on("renderSceneControls", (_app, html) => {
   });
 });
 
+/** V11 settings menus expect FormApplication; this is a lightweight launcher. */
+class HighestDmgSettingsMenu extends FormApplication {
+  render(_force = false, _options = {}) {
+    openScoreboard();
+    return this;
+  }
+  async _updateObject(_event, _formData) {}
+}
+
 Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "records", {
     name: "Highest DMG Records",
@@ -404,7 +413,7 @@ Hooks.once("init", () => {
     label: "Open Scoreboard",
     hint: "Open the campaign's Highest Damage leaderboard. Only GMs can change records.",
     icon: "fa-solid fa-trophy",
-    type: HighestDmgApp,
+    type: HighestDmgSettingsMenu,
     restricted: false
   });
 });
