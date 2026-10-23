@@ -74,6 +74,16 @@
           {{/unless}}
         </div>
 
+        <div class="averis-hdmg__tracking-control">
+          <div>
+            <div class="averis-hdmg__tracking-label"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Automatic Damage Tracking</div>
+            <p>Records a new highest hit only after damage is actually applied to a target. Only identifiable player characters are tracked.</p>
+          </div>
+          <button class="averis-hdmg__button averis-hdmg__button--tracking {{#if trackingEnabled}}averis-hdmg__button--tracking-on{{/if}}" type="button" data-hdmg-action="toggle-tracking" aria-pressed="{{#if trackingEnabled}}true{{else}}false{{/if}}" {{#if busy}}disabled{{/if}}>
+            <i class="fa-solid fa-power-off" aria-hidden="true"></i> {{#if trackingEnabled}}ON{{else}}OFF{{/if}}
+          </button>
+        </div>
+
         {{#if editorOpen}}
           <form class="averis-hdmg__form">
             <h4>{{#if editing}}Edit Record{{else}}New Record{{/if}}</h4>
