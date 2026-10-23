@@ -1,0 +1,110 @@
+<section class="averis-hdmg">
+  <header class="averis-hdmg__banner">
+    <div class="averis-hdmg__meta">
+      <span class="averis-hdmg__brand">✦ AVERIS · CAMPAIGN RECORDS</span>
+      <span class="averis-hdmg__view"><i class="fa-solid {{#if canEdit}}fa-shield-halved{{else}}fa-eye{{/if}}" aria-hidden="true"></i> {{#if canEdit}}GM VIEW{{else}}PLAYER VIEW{{/if}}</span>
+    </div>
+    <h1>Damage Hall of Fame</h1>
+    <p>The heroes who delivered the strongest single hit.</p>
+  </header>
+
+  <div class="averis-hdmg__content">
+    <div class="averis-hdmg__grid">
+      <section class="averis-hdmg__hero" aria-label="Highest damage record">
+        <div class="averis-hdmg__eyebrow"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> HIGHEST DMG</div>
+        {{#if leader}}
+          <div class="averis-hdmg__hero-identity">
+            {{#if leader.img}}
+              <img class="averis-hdmg__hero-art" src="{{leader.img}}" alt="{{leader.name}} portrait">
+            {{/if}}
+            <div>
+              <div class="averis-hdmg__label">♛ Current Record Holder</div>
+              <h2>{{leader.name}}</h2>
+            </div>
+          </div>
+          <div class="averis-hdmg__hero-number">{{leader.displayDamage}} <small>DMG</small></div>
+          <div class="averis-hdmg__hero-bottom"><i class="fa-solid fa-star" aria-hidden="true"></i> #1 IN CAMPAIGN</div>
+        {{else}}
+          <div class="averis-hdmg__empty-hero">
+            <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+            <h2>No records yet</h2>
+            <p>{{#if canEdit}}Add your first damage record.{{else}}The GM has not added a damage record yet.{{/if}}</p>
+          </div>
+        {{/if}}
+      </section>
+
+      <section class="averis-hdmg__board" aria-label="Damage leaderboard">
+        <header class="averis-hdmg__board-head">
+          <span><i class="fa-solid fa-trophy" aria-hidden="true"></i> Leaderboard</span>
+          <small>{{recordCount}} records</small>
+        </header>
+        {{#if hasRecords}}
+          <ol class="averis-hdmg__records">
+            {{#each rows}}
+              <li class="averis-hdmg__record {{#if isFirst}}averis-hdmg__record--first{{/if}}">
+                <span class="averis-hdmg__rank">{{#if isFirst}}♛{{else}}{{rank}}{{/if}}</span>
+                {{#if img}}
+                  <img class="averis-hdmg__avatar" src="{{img}}" alt="">
+                {{else}}
+                  <span class="averis-hdmg__avatar averis-hdmg__avatar--letter">{{firstLetter}}</span>
+                {{/if}}
+                <span class="averis-hdmg__record-name">{{name}}</span>
+                <span class="averis-hdmg__record-damage">{{displayDamage}} <small>DMG</small></span>
+                {{#if ../canEdit}}
+                  <button class="averis-hdmg__smallbtn" type="button" data-hdmg-action="edit" data-record-id="{{id}}" title="Edit {{name}}" aria-label="Edit {{name}}"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>
+                {{/if}}
+              </li>
+            {{/each}}
+          </ol>
+        {{else}}
+          <div class="averis-hdmg__empty-list">The leaderboard is empty.</div>
+        {{/if}}
+      </section>
+    </div>
+
+    {{#if canEdit}}
+      <section class="averis-hdmg__manager">
+        <div class="averis-hdmg__manager-head">
+          <div>
+            <h3><i class="fa-solid fa-gear" aria-hidden="true"></i> Record Manager</h3>
+            <p>Add or change a character's highest damage manually.</p>
+          </div>
+          {{#unless editorOpen}}
+            <button class="averis-hdmg__button averis-hdmg__button--primary" type="button" data-hdmg-action="add"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Record</button>
+          {{/unless}}
+        </div>
+
+        {{#if editorOpen}}
+          <form class="averis-hdmg__form">
+            <h4>{{#if editing}}Edit Record{{else}}New Record{{/if}}</h4>
+            <div class="averis-hdmg__fields">
+              <label class="averis-hdmg__field averis-hdmg__field--wide">
+                <span>Choose a Character <em>(optional)</em></span>
+                <select name="actorId" {{#if busy}}disabled{{/if}}>
+                  <option value="">Manual Entry</option>
+                  {{#each actors}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+                </select>
+              </label>
+              <label class="averis-hdmg__field">
+                <span>Character Name</span>
+                <input name="name" type="text" value="{{editor.name}}" maxlength="48" required placeholder="Character name" {{#if busy}}disabled{{/if}}>
+              </label>
+              <label class="averis-hdmg__field">
+                <span>Highest DMG</span>
+                <input name="damage" type="number" min="0" max="999999999" step="1" value="{{editor.damage}}" required placeholder="0" {{#if busy}}disabled{{/if}}>
+              </label>
+            </div>
+            <div class="averis-hdmg__actions">
+              <button type="submit" class="averis-hdmg__button averis-hdmg__button--primary" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Record</button>
+              <button type="button" class="averis-hdmg__button" data-hdmg-action="cancel" {{#if busy}}disabled{{/if}}>Cancel</button>
+              {{#if editing}}
+                <button type="button" class="averis-hdmg__button averis-hdmg__button--danger" data-hdmg-action="delete" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-trash" aria-hidden="true"></i> Delete</button>
+              {{/if}}
+            </div>
+          </form>
+        {{/if}}
+      </section>
+    {{/if}}
+  </div>
+  <footer class="averis-hdmg__footer">AVERIS · HIGHEST DAMAGE RECORDS <span>{{#if canEdit}}GM MANAGED{{else}}READ ONLY{{/if}}</span></footer>
+</section>
