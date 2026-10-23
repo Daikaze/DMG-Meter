@@ -1,11 +1,10 @@
 /**
- * Averis | Highest DMG — Foundry VTT V14.
+ * Averis | Highest DMG — Foundry VTT V11.
  * Records are manual only; no encounter or automatic damage tracking.
  * No global CSS, document monkey-patching, or core UI overrides.
  */
 const MODULE_ID = "averis-highest-dmg";
 const MAX_DAMAGE = 999_999_999;
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const activeWindows = new Set();
 
 function recordsFromSettings() {
@@ -51,28 +50,26 @@ function getTokenArt(actor) {
     || normalizeArtPath(actor.img);
 }
 
-class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
-  static DEFAULT_OPTIONS = {
-    id: "averis-highest-dmg-window",
-    classes: ["averis-highest-dmg-window"],
-    window: {
+class HighestDmgApp extends Application {
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      id: "averis-highest-dmg-window",
+      classes: ["averis-highest-dmg-window"],
+      template: `modules/${MODULE_ID}/templates/scoreboard.hbs`,
       title: "Averis | Highest DMG",
-      icon: "fa-solid fa-trophy",
-      resizable: true
-    },
-    position: { width: 770, height: 680 }
-  };
-
-  static PARTS = {
-    scoreboard: { template: `modules/${MODULE_ID}/templates/scoreboard.hbs` }
-  };
+      width: 770,
+      height: 680,
+      resizable: true,
+      popOut: true
+    });
+  }
 
   _editorOpen = false;
   _editingId = null;
   _busy = false;
 
-  async _prepareContext(options) {
-    const context = await super._prepareContext(options);
+  getData(options = {}) {
+    const context = super.getData(options);
     const rows = sortRecords(recordsFromSettings()).map((record, index) => ({
       ...record,
       rank: index + 1,
@@ -107,10 +104,10 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
     };
   }
 
-  async _onRender(context, options) {
-    await super._onRender(context, options);
+  activateListeners(html) {
+    super.activateListeners(html);
     activeWindows.add(this);
-    const root = this.element.querySelector(".averis-hdmg");
+    const root = html?.[0]?.querySelector(".averis-hdmg");
     if (!root) return;
 
     root.addEventListener("click", (event) => {
@@ -194,8 +191,7 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _browseArt(form) {
     if (!form || !game.user?.isGM) return;
-    const Picker = foundry.applications.apps?.FilePicker?.implementation
-      || foundry.applications.apps?.FilePicker;
+    const Picker = FilePicker;
     if (!Picker) {
       ui.notifications.error("Foundry's File Picker is unavailable.");
       return;
@@ -210,16 +206,16 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
           this._setArt(form, path);
         }
       });
-      await picker.render({ force: true });
+      picker.render(true);
     } catch (error) {
       console.error(`${MODULE_ID} | Cannot browse token art`, error);
       ui.notifications.error("Could not open the image picker.");
     }
   }
 
-  _onClose(options) {
+  async close(options = {}) {
     activeWindows.delete(this);
-    return super._onClose(options);
+    return super.close(options);
   }
 
   _openEditor(recordId = null) {
@@ -308,12 +304,15 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       this._closeEditor();
       return;
     }
-    const confirmed = await DialogV2.confirm({
-      window: { title: "Delete Highest DMG Record" },
-      content: `<p>Remove the record for <strong>${foundry.utils.escapeHTML(record.name)}</strong>?</p>`,
-      yes: { label: "Delete" },
-      no: { label: "Cancel" },
-      rejectClose: false
+    const safeName = record.name.replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+    const confirmed = await Dialog.confirm({
+      title: "Delete Highest DMG Record",
+      content: `<p>Remove the record for <strong>${safeName}</strong>?</p>`,
+      yes: () => true,
+      no: () => false,
+      defaultYes: false
     });
     if (!confirmed) return;
     this._busy = true;
@@ -334,69 +333,53 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
 }
 
 let scoreboardWindow = null;
-let openingScoreboard = null;
 
 function openScoreboard() {
-  // A single instance is shared by the Scene Control and the module API.
-  // Guard rendering to avoid duplicate windows if both tool and control
-  // onChange fire as Foundry activates the control.
   if (!scoreboardWindow) scoreboardWindow = new HighestDmgApp();
-
   if (scoreboardWindow.rendered) {
-    scoreboardWindow.bringToFront();
+    scoreboardWindow.bringToTop();
     return scoreboardWindow;
   }
-
-  if (openingScoreboard) return openingScoreboard;
-  try {
-    openingScoreboard = Promise.resolve(scoreboardWindow.render({ force: true }));
-    return openingScoreboard.finally(() => { openingScoreboard = null; });
-  } catch (error) {
-    openingScoreboard = null;
-    console.error(`${MODULE_ID} | Could not open Highest DMG`, error);
-    ui.notifications.error("Could not open the Highest DMG scoreboard.");
-    return null;
-  }
+  return scoreboardWindow.render(true);
 }
 
 /**
- * Foundry v14 scene controls appear on the LEFT side of the canvas.
- * Use the supported getSceneControlButtons API, never hand-insert a DOM
- * element into the right-side sidebar or another module's navigation.
- *
- * The group (trophy icon, left column) opens the scoreboard directly;
- * the group's visible tool (right column) can open it again at any time.
+ * Foundry V11 uses an ARRAY of Scene Controls, with a layer and a tools
+ * array. The trophy icon appears in the left Scene Controls toolbar.
+ * Use TokenLayer so selecting this UI group cannot activate a missing layer.
  */
 Hooks.on("getSceneControlButtons", (controls) => {
-  if (!controls || typeof controls !== "object") return;
+  if (!Array.isArray(controls)) return;
+  if (controls.some((control) => control.name === "averisHighestDmg")) return;
 
-  const orders = Object.values(controls).map(control => Number(control?.order) || 0);
-  const order = Math.max(0, ...orders) + 1;
-  const name = "averisHighestDmg";
-
-  controls[name] = {
-    name,
+  controls.push({
+    name: "averisHighestDmg",
     title: "Highest DMG",
-    icon: "fa-solid fa-trophy",
-    order,
-    visible: true, // GM and all players
+    layer: "TokenLayer",
+    icon: "fas fa-trophy",
+    visible: true,  // Players and GM can access the leaderboard.
     activeTool: "open",
-    onChange: (_event, active) => {
-      if (active) void openScoreboard();
-    },
-    tools: {
-      open: {
-        name: "open", // MUST match tools.open to avoid Foundry control errors
-        title: "Open Highest DMG",
-        icon: "fa-solid fa-trophy",
-        order: 0,
-        visible: true,
-        onChange: (_event, active) => {
-          if (active) void openScoreboard();
-        }
-      }
-    }
-  };
+    tools: [{
+      name: "open",
+      title: "Open Highest DMG",
+      icon: "fas fa-trophy",
+      visible: true,
+      button: true,
+      onClick: () => openScoreboard()
+    }]
+  });
+});
+
+/**
+ * In V11 clicking the left control icon normally only selects its palette.
+ * Also open the scoreboard on that click, not only on the adjacent tool.
+ * Bind to Foundry's rendered Scene Controls node, not the right sidebar.
+ */
+Hooks.on("renderSceneControls", (_app, html) => {
+  const icon = html.find('[data-control="averisHighestDmg"]');
+  icon.off("click.averisHighestDmg").on("click.averisHighestDmg", () => {
+    openScoreboard();
+  });
 });
 
 Hooks.once("init", () => {
@@ -409,7 +392,7 @@ Hooks.once("init", () => {
     default: [],
     onChange: () => {
       for (const app of activeWindows) {
-        if (app.rendered && !app._busy) void app.render();
+        if (app.rendered && !app._busy) app.render(false);
       }
     }
   });
