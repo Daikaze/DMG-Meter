@@ -97,3 +97,56 @@
   .averis-hdmg__rank { flex-basis:20px; }
   .averis-hdmg__avatar { width:29px; height:29px; flex-basis:29px; }
 }
+
+/*
+ * Sidebar launcher: tightly scoped to two inserted buttons.
+ * Never modify Foundry's global colors or existing sidebar tabs.
+ */
+#sidebar .averis-hdmg-sidebar-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  margin: 1px;
+  border: 1px solid #8b693e;
+  border-radius: 7px;
+  color: #f0c782;
+  background: #30271e;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: none;
+}
+#sidebar .averis-hdmg-sidebar-shortcut:hover,
+#sidebar .averis-hdmg-sidebar-shortcut:focus-visible {
+  color: #fff0d1;
+  border-color: #dbac69;
+  background: #4a3723;
+}
+#sidebar .averis-hdmg-settings-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: calc(100% - 16px);
+  margin: 9px 8px;
+  min-height: 35px;
+  padding: 8px 12px;
+  border: 1px solid #8b693e;
+  border-radius: 6px;
+  color: #f0c782;
+  background: #30271e;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: none;
+}
+#sidebar .averis-hdmg-settings-shortcut:hover,
+#sidebar .averis-hdmg-settings-shortcut:focus-visible {
+  color: #fff0d1;
+  border-color: #dbac69;
+  background: #4a3723;
+}
