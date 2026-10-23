@@ -1,17 +1,16 @@
 {
   "id": "averis-highest-dmg",
   "title": "Averis | Highest DMG",
-  "description": "Highest DMG scoreboard for Foundry V11, with token artwork, left-side Scene Controls button, read-only player view and GM-managed records.",
-  "version": "1.4.0",
+  "description": "Averis Highest DMG leaderboard for Foundry V14, with token artwork selection, custom art browsing, a scene-control shortcut, and GM-only editing.",
+  "version": "1.5.0",
   "authors": [
     {
       "name": "Daikaze"
     }
   ],
   "compatibility": {
-    "minimum": "11",
-    "verified": "11",
-    "maximum": "11"
+    "minimum": "14",
+    "verified": "14"
   },
   "esmodules": [
     "scripts/highest-dmg.js"
@@ -27,6 +26,6 @@
     }
   ],
   "manifest": "https://raw.githubusercontent.com/Daikaze/DMG-Meter/main/module.json",
-  "download": "https://github.com/Daikaze/DMG-Meter/releases/download/v1.4.0/averis-highest-dmg-v1.4.0.zip",
+  "download": "https://github.com/Daikaze/DMG-Meter/releases/download/v1.5.0/averis-highest-dmg-v1.5.0.zip",
   "url": "https://github.com/Daikaze/DMG-Meter"
 }
