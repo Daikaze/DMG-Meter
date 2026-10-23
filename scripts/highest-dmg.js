@@ -103,7 +103,8 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       editing: Boolean(activeRecord),
       editor,
       actors,
-      busy: this._busy
+      busy: this._busy,
+      trackingEnabled: game.settings.get(MODULE_ID, "autoTracking")
     };
   }
 
@@ -121,6 +122,7 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       if (action === "edit") return this._openEditor(target.dataset.recordId);
       if (action === "cancel") return this._closeEditor();
       if (action === "delete") void this._deleteRecord();
+      if (action === "toggle-tracking") void this._toggleTracking();
       if (action === "browse-art") void this._browseArt(root.querySelector("form.averis-hdmg__form"));
       if (action === "token-art") this._applyActorArt(root.querySelector("form.averis-hdmg__form"), "token");
       if (action === "portrait-art") this._applyActorArt(root.querySelector("form.averis-hdmg__form"), "portrait");
@@ -151,6 +153,22 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
         if (fallback) fallback.hidden = false;
       });
       this._refreshArtPreview(form);
+    }
+  }
+
+  async _toggleTracking() {
+    if (!game.user?.isGM || this._busy) return;
+    this._busy = true;
+    try {
+      const current = game.settings.get(MODULE_ID, "autoTracking");
+      await game.settings.set(MODULE_ID, "autoTracking", !current);
+      ui.notifications.info(!current ? "Automatic damage tracking enabled." : "Automatic damage tracking disabled.");
+    } catch (error) {
+      console.error(`${MODULE_ID} | Could not change automatic tracking`, error);
+      ui.notifications.error("Could not update automatic tracking.");
+    } finally {
+      this._busy = false;
+      await this.render();
     }
   }
 
@@ -400,6 +418,20 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("init", () => {
+  game.settings.register(MODULE_ID, "autoTracking", {
+    name: "Automatic Damage Tracking",
+    hint: "Record a new personal highest damage only after damage has been applied to a target. The source must be identifiable; this setting is GM-only.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: () => {
+      for (const app of activeWindows) {
+        if (app.rendered && !app._busy) void app.render();
+      }
+    }
+  });
+
   game.settings.register(MODULE_ID, "records", {
     name: "Highest DMG Records",
     hint: "GM-maintained Highest Damage records.",
