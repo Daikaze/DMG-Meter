@@ -230,9 +230,74 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
 let scoreboardWindow = null;
 function openScoreboard() {
+  // Both players and the GM use the same interface, with GM actions gated
+  // server-side by world-setting permissions and client-side by isGM checks.
   if (!scoreboardWindow) scoreboardWindow = new HighestDmgApp();
+  if (scoreboardWindow.rendered) {
+    scoreboardWindow.bringToFront();
+    return scoreboardWindow;
+  }
   return scoreboardWindow.render({ force: true });
 }
+
+/**
+ * Add one *shortcut* to the right-hand Foundry sidebar, not a new Foundry
+ * tab. Keeping the button separate from core tab actions avoids disrupting
+ * selection, tab switching, and other modules that customize the sidebar.
+ *
+ * renderSidebar runs again when Foundry rebuilds its navigation, so this is
+ * reentrant and does not need an aggressive MutationObserver or monkeypatch.
+ */
+function installSidebarShortcut() {
+  const sidebar = document.querySelector("#sidebar");
+  if (!sidebar) return;
+
+  const nav = sidebar.querySelector(
+    "#sidebar-tabs, nav.sidebar-tabs, nav[role='tablist'], nav.tabs, " +
+    "nav[data-group='primary'], .sidebar-tabs, .sidebar-navigation"
+  );
+  // Different v14 builds or UI modules may use a plain nav. In that case,
+  // find only a direct sidebar navigation carrying tab buttons.
+  const fallback = [...sidebar.querySelectorAll("nav")]
+    .find((element) => element.querySelector("[data-tab], [data-action='tab']"));
+  const target = nav || fallback;
+  if (!target || target.querySelector(".averis-hdmg-sidebar-shortcut")) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "averis-hdmg-sidebar-shortcut";
+  button.title = "Highest DMG";
+  button.setAttribute("aria-label", "Open Highest DMG scoreboard");
+  button.innerHTML = '<i class="fa-solid fa-trophy" aria-hidden="true"></i>';
+  // Explicitly do not set data-tab or data-action; this isn't a tab.
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void openScoreboard();
+  });
+  target.append(button);
+}
+
+/** Settings-tab fallback, in case the user uses a heavily customized sidebar. */
+function installSettingsShortcut(app, html) {
+  installSidebarShortcut();
+  const settings = html instanceof HTMLElement ? html : app?.element;
+  if (!settings || settings.querySelector(".averis-hdmg-settings-shortcut")) return;
+  const shortcut = document.createElement("button");
+  shortcut.type = "button";
+  shortcut.className = "averis-hdmg-settings-shortcut";
+  shortcut.innerHTML = '<i class="fa-solid fa-trophy" aria-hidden="true"></i> Highest DMG';
+  shortcut.title = "Open Highest DMG";
+  shortcut.addEventListener("click", (event) => {
+    event.preventDefault();
+    void openScoreboard();
+  });
+  // Local to the Settings tab, not to the whole sidebar theme.
+  settings.prepend(shortcut);
+}
+
+Hooks.on("renderSidebar", installSidebarShortcut);
+Hooks.on("renderSettings", installSettingsShortcut);
 
 Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "records", {
@@ -262,4 +327,5 @@ Hooks.once("init", () => {
 Hooks.once("ready", () => {
   const module = game.modules.get(MODULE_ID);
   if (module) module.api = Object.freeze({ open: openScoreboard });
+  installSidebarShortcut();
 });
