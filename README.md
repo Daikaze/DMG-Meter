@@ -1,4 +1,4 @@
-# Averis | Highest DMG
+# Averis | Highest DMG (v1.1.0)
 
 **Foundry VTT v14** · D&D 5e 5.3.3 compatible.
 
@@ -18,11 +18,11 @@ Alternatively, download the repository and place its contents inside `Data/modul
 
 ## How to use
 
-- Open **Game Settings → Configure Settings → Module Settings → Averis | Highest DMG → Open Scoreboard**.
+- **GM and players:** click the gold **trophy icon** in Foundry's right-hand sidebar to open **Highest DMG** directly. A **Highest DMG** button is also available in the Settings sidebar panel as a fallback.\n- You can still open it from **Game Settings → Configure Settings → Module Settings → Averis | Highest DMG → Open Scoreboard**.
 - **Add Record**: select a world character to use its portrait, or enter a name manually, then enter the damage.
 - **Pencil icon**: edit any existing record; **Delete** removes it after confirmation.
 - Highest damage ranks first, with the leader featured in the gold card.
-- Only the GM can edit. Players can view the scoreboard in read-only mode.
+- **GM** sees Add Record, Edit and Delete. **Players** see only the leaderboard; no editing controls are rendered. Saving and deleting also checks GM permissions and relies on Foundry's world setting authorization.\n- The shortcut is shown to both GMs and players. Clicking it opens a separate scoreboard window without switching your active sidebar tab.
 - Records are saved to a world setting and survive Foundry restarts.
 
 You can add a hotbar Script macro:
@@ -36,4 +36,4 @@ game.modules.get("averis-highest-dmg").api.open();
 - No global CSS or core UI overrides.
 - Uses the Foundry v14 ApplicationV2 and Handlebars APIs.
 - Manual highest DMG only; no Midi-QOL integration or automatic tracking.
-- Automated tests verify record handling, but please also test inside your own Foundry installation.
+- Code/static checks can run outside Foundry, but sidebar placement and actual player permissions should also be tested directly with one GM client and one player client in Foundry V14.
