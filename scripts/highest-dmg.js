@@ -107,7 +107,9 @@ class HighestDmgApp extends Application {
   activateListeners(html) {
     super.activateListeners(html);
     activeWindows.add(this);
-    const root = html?.[0]?.querySelector(".averis-hdmg");
+    const container = html?.[0];
+    const root = container?.matches?.(".averis-hdmg")
+      ? container : container?.querySelector?.(".averis-hdmg");
     if (!root) return;
 
     root.addEventListener("click", (event) => {
