@@ -32,6 +32,7 @@ jobs:
           files = [
               "module.json",
               "scripts/highest-dmg.js",
+              "scripts/auto-tracker.js",
               "styles/highest-dmg.css",
               "templates/scoreboard.hbs",
               "languages/en.json",
@@ -65,6 +66,7 @@ jobs:
           - Custom token art: browse files, use token art or character portrait, preview images before saving.
           - Restored V14 ApplicationV2 window, FilePicker, DialogV2 and scene controls.
           - Existing records and their artwork remain saved in world settings.
+          - Optional GM-controlled automatic tracking uses only post-applied dnd5e or Midi-QOL damage hooks; manual edits stay available.
 
           ### Install
           Use the stable manifest:
