@@ -18,7 +18,7 @@ function recordsFromSettings() {
       name: String(row.name ?? "").slice(0, 48),
       damage: Number(row.damage),
       actorId: String(row.actorId ?? ""),
-      img: String(row.img ?? "")
+      img: normalizeArtPath(row.img)
     }))
     .filter((row) => row.id && row.name.trim() && Number.isSafeInteger(row.damage)
       && row.damage >= 0 && row.damage <= MAX_DAMAGE);
@@ -30,6 +30,25 @@ function sortRecords(records) {
 
 function formatDamage(value) {
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+/** Images are paths picked from Foundry or explicitly entered by the GM. */
+function normalizeArtPath(value) {
+  const path = String(value ?? "").trim();
+  if (!path || path.length > 2048 || /[\r\n<>]/.test(path)
+      || /^(?:javascript|data|file|vbscript):/i.test(path)) return "";
+  return path;
+}
+
+/** Prefer the character's actual scene token, then prototype token, then portrait. */
+function getTokenArt(actor) {
+  if (!actor) return "";
+  const active = globalThis.canvas?.tokens?.placeables?.find(
+    (token) => token?.actor?.id === actor.id
+  )?.document?.texture?.src;
+  const paths = [active, actor.prototypeToken?.texture?.src, actor.img];
+  return paths.map(normalizeArtPath).find((path) => path && !path.includes("*"))
+    || normalizeArtPath(actor.img);
 }
 
 class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -63,7 +82,7 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }));
     const canEdit = Boolean(game.user?.isGM);
     const activeRecord = rows.find((row) => row.id === this._editingId);
-    const editor = activeRecord || { name: "", damage: "", actorId: "" };
+    const editor = activeRecord || { name: "", damage: "", actorId: "", img: "" };
     const actors = canEdit ? [...game.actors.contents]
       .filter((actor) => actor.type === "character" || actor.hasPlayerOwner)
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -102,6 +121,10 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       if (action === "edit") return this._openEditor(target.dataset.recordId);
       if (action === "cancel") return this._closeEditor();
       if (action === "delete") void this._deleteRecord();
+      if (action === "browse-art") void this._browseArt(root.querySelector("form.averis-hdmg__form"));
+      if (action === "token-art") this._applyActorArt(root.querySelector("form.averis-hdmg__form"), "token");
+      if (action === "portrait-art") this._applyActorArt(root.querySelector("form.averis-hdmg__form"), "portrait");
+      if (action === "clear-art") this._setArt(root.querySelector("form.averis-hdmg__form"), "");
     });
 
     const form = root.querySelector("form.averis-hdmg__form");
@@ -113,8 +136,84 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const actorSelect = form.elements.namedItem("actorId");
       actorSelect?.addEventListener("change", () => {
         const actor = game.actors.get(actorSelect.value);
-        if (actor) form.elements.namedItem("name").value = actor.name;
+        if (actor) {
+          form.elements.namedItem("name").value = actor.name;
+          this._setArt(form, getTokenArt(actor));
+        }
       });
+
+      const artInput = form.elements.namedItem("img");
+      artInput?.addEventListener("input", () => this._refreshArtPreview(form));
+      const previewImage = form.querySelector(".averis-hdmg__art-preview img");
+      previewImage?.addEventListener("error", () => {
+        previewImage.hidden = true;
+        const fallback = form.querySelector(".averis-hdmg__art-placeholder");
+        if (fallback) fallback.hidden = false;
+      });
+      this._refreshArtPreview(form);
+    }
+  }
+
+  _setArt(form, path) {
+    if (!form || !game.user?.isGM) return;
+    const input = form.elements.namedItem("img");
+    if (!input) return;
+    input.value = normalizeArtPath(path);
+    this._refreshArtPreview(form);
+  }
+
+  _refreshArtPreview(form) {
+    if (!form) return;
+    const path = normalizeArtPath(form.elements.namedItem("img")?.value);
+    const image = form.querySelector(".averis-hdmg__art-preview img");
+    const placeholder = form.querySelector(".averis-hdmg__art-placeholder");
+    if (image) {
+      image.hidden = !path;
+      if (path) {
+        if (image.getAttribute("src") !== path) image.setAttribute("src", path);
+      } else image.removeAttribute("src");
+    }
+    if (placeholder) placeholder.hidden = Boolean(path);
+  }
+
+  _applyActorArt(form, kind) {
+    if (!form || !game.user?.isGM) return;
+    const actorId = form.elements.namedItem("actorId")?.value;
+    const actor = actorId ? game.actors.get(actorId) : null;
+    if (!actor) {
+      ui.notifications.warn("Select a character first to use their token or portrait art.");
+      return;
+    }
+    const path = kind === "portrait" ? normalizeArtPath(actor.img) : getTokenArt(actor);
+    if (!path) {
+      ui.notifications.warn("The selected character has no image available.");
+      return;
+    }
+    this._setArt(form, path);
+  }
+
+  async _browseArt(form) {
+    if (!form || !game.user?.isGM) return;
+    const Picker = foundry.applications.apps?.FilePicker?.implementation
+      || foundry.applications.apps?.FilePicker;
+    if (!Picker) {
+      ui.notifications.error("Foundry's File Picker is unavailable.");
+      return;
+    }
+    const selected = normalizeArtPath(form.elements.namedItem("img")?.value);
+    try {
+      const picker = new Picker({
+        type: "image",
+        current: selected,
+        callback: (path) => {
+          if (!form.isConnected || !this._editorOpen) return;
+          this._setArt(form, path);
+        }
+      });
+      await picker.render({ force: true });
+    } catch (error) {
+      console.error(`${MODULE_ID} | Cannot browse token art`, error);
+      ui.notifications.error("Could not open the image picker.");
     }
   }
 
@@ -145,7 +244,13 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const rawDamage = String(form.elements.namedItem("damage")?.value ?? "").trim();
     const damage = Number(rawDamage);
     const actorId = String(form.elements.namedItem("actorId")?.value ?? "");
+    const enteredArt = String(form.elements.namedItem("img")?.value ?? "").trim();
+    const img = normalizeArtPath(enteredArt);
 
+    if (enteredArt && !img) {
+      ui.notifications.warn("Enter a valid image path for the character art.");
+      return;
+    }
     if (!name || name.length > 48) {
       ui.notifications.warn("Enter a character name (up to 48 characters).");
       return;
@@ -161,7 +266,7 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
       name,
       damage,
       actorId: actor?.id || "",
-      img: actor?.img || ""
+      img
     };
     const records = recordsFromSettings();
     const index = records.findIndex((row) => row.id === updated.id);
