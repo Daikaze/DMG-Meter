@@ -26,6 +26,6 @@
     }
   ],
   "manifest": "https://raw.githubusercontent.com/Daikaze/DMG-Meter/main/module.json",
-  "download": "https://github.com/Daikaze/DMG-Meter/archive/refs/heads/main.zip",
+  "download": "https://github.com/Daikaze/DMG-Meter/releases/download/v1.3.0/averis-highest-dmg-v1.3.0.zip",
   "url": "https://github.com/Daikaze/DMG-Meter"
 }
