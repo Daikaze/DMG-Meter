@@ -94,6 +94,23 @@
                 <input name="damage" type="number" min="0" max="999999999" step="1" value="{{editor.damage}}" required placeholder="0" {{#if busy}}disabled{{/if}}>
               </label>
             </div>
+            <div class="averis-hdmg__art-editor">
+              <div class="averis-hdmg__art-preview" aria-label="Selected character art">
+                <img src="{{editor.img}}" alt="Art preview" {{#unless editor.img}}hidden{{/unless}}>
+                <span class="averis-hdmg__art-placeholder" {{#if editor.img}}hidden{{/if}}><i class="fa-solid fa-image" aria-hidden="true"></i></span>
+              </div>
+              <div class="averis-hdmg__art-options">
+                <label for="averis-hdmg-art-path">Token / Character Art <em>(optional)</em></label>
+                <input id="averis-hdmg-art-path" type="text" name="img" value="{{editor.img}}" maxlength="2048" placeholder="Choose an image or paste its Foundry path" {{#if busy}}disabled{{/if}}>
+                <div class="averis-hdmg__art-buttons">
+                  <button class="averis-hdmg__button averis-hdmg__button--art" type="button" data-hdmg-action="browse-art" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Browse Art</button>
+                  <button class="averis-hdmg__button averis-hdmg__button--art" type="button" data-hdmg-action="token-art" {{#if busy}}disabled{{/if}} title="Use the selected character's scene or prototype token image"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Use Token Art</button>
+                  <button class="averis-hdmg__button averis-hdmg__button--art" type="button" data-hdmg-action="portrait-art" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-portrait" aria-hidden="true"></i> Use Portrait</button>
+                  <button class="averis-hdmg__button averis-hdmg__button--art averis-hdmg__button--clear" type="button" data-hdmg-action="clear-art" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-xmark" aria-hidden="true"></i> Clear</button>
+                </div>
+                <p class="averis-hdmg__art-help">The selected art appears in the leaderboard and on the record holder card. This does not modify the actor or token on the canvas.</p>
+              </div>
+            </div>
             <div class="averis-hdmg__actions">
               <button type="submit" class="averis-hdmg__button averis-hdmg__button--primary" {{#if busy}}disabled{{/if}}><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save Record</button>
               <button type="button" class="averis-hdmg__button" data-hdmg-action="cancel" {{#if busy}}disabled{{/if}}>Cancel</button>
