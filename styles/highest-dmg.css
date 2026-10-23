@@ -160,3 +160,38 @@
   .averis-hdmg__art-editor { grid-template-columns: 1fr; }
   .averis-hdmg__art-preview { width: 90px; height: 90px; }
 }
+
+/* Automatic tracking controls — GM-only, scoped to Highest DMG window. */
+.averis-hdmg__tracking-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 0 2px;
+  margin-top: 15px;
+  border-top: 1px solid #3b3b47;
+}
+.averis-hdmg__tracking-label {
+  color: #f1e2c9;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.averis-hdmg__tracking-label i { color: #dfb879; margin-right: 5px; }
+.averis-hdmg__tracking-control p { max-width: 520px; font-size: 11px; line-height: 1.5; color: #ada6b1; }
+.averis-hdmg__button--tracking {
+  min-width: 87px !important;
+  border-color: #72626a !important;
+  color: #d7bec5 !important;
+  background: #423039 !important;
+  flex: 0 0 auto;
+}
+.averis-hdmg__button--tracking-on {
+  background: #293e33 !important;
+  border-color: #72a681 !important;
+  color: #d1f3da !important;
+}
+.averis-hdmg__button--tracking:focus-visible { outline: 2px solid #d8ab6a; outline-offset: 2px; }
+@media(max-width: 420px) {
+  .averis-hdmg__tracking-control { flex-wrap: wrap; }
+}
