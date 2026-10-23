@@ -1,6 +1,6 @@
-# Averis | Highest DMG (v1.3.0)
+# Averis | Highest DMG (v1.4.0 — Foundry V11)
 
-**Foundry VTT v14** · D&D 5e 5.3.3 compatible.
+**Foundry VTT V11 only** · Manual Highest DMG records for D&D 5e. Not compatible with Foundry V14.
 
 A dark gold-accented **Highest DMG** leaderboard for your Averis campaign. The board begins empty and contains just **one category: highest single-hit damage**. There are no sample characters, example encounters, or automatic damage calculations.
 
@@ -18,7 +18,7 @@ Alternatively, download the repository and place its contents inside `Data/modul
 
 ## How to use
 
-- **GM and players:** click the **trophy icon** in the **left-hand Scene Controls toolbar** (beside the canvas, as shown with the other scene tools). It opens Highest DMG directly. Its adjacent tool icon can also reopen the scoreboard.
+- **GM and players:** click the **trophy icon** on the **left-hand Scene Controls toolbar**. In V11, the icon opens Highest DMG on click; the adjacent tool also opens the same window.
 - You can still open it from **Game Settings → Configure Settings → Module Settings → Averis | Highest DMG → Open Scoreboard**.
 - **Add Record**: select a world character or enter its name manually, then enter the damage.
 - **Token / Character Art**: choose **Browse Art** to select or upload an image with Foundry's image picker; optionally paste a Foundry image path. **Use Token Art** selects the current scene token image (or prototype token image), **Use Portrait** selects the actor's portrait, and **Clear** removes the image. Pick a character first for the Token/Portrait buttons.
@@ -27,7 +27,7 @@ Alternatively, download the repository and place its contents inside `Data/modul
 - **Pencil icon**: edit any existing record, including its art; **Delete** removes it after confirmation.
 - Highest damage ranks first, with the leader featured in the gold card.
 - **GM** sees Add Record, Edit and Delete. **Players** see only the leaderboard; no editing controls are rendered. Saving and deleting also checks GM permissions and relies on Foundry's world setting authorization.
-- The launcher uses Foundry V14's native `getSceneControlButtons` hook. It appears for everyone in the left scene toolbar. It does not insert an unclickable floating icon on the right.
+- The launcher uses Foundry V11's **array-based** `getSceneControlButtons` hook, the existing TokenLayer, and a V11 Scene Controls render hook for one-click access. It does not insert icons into the right sidebar.
 - Records are saved to a world setting and survive Foundry restarts.
 
 You can add a hotbar Script macro:
@@ -39,7 +39,11 @@ game.modules.get("averis-highest-dmg").api.open();
 ## Notes
 
 - No global CSS or core UI overrides.
-- Uses the Foundry v14 ApplicationV2 and Handlebars APIs.
+- Uses Foundry **V11** `Application`, `FormApplication`, Handlebars templates, `FilePicker`, and `Dialog`. Does not use V12+ or V14 application APIs.
 - Manual highest DMG only; no Midi-QOL integration or automatic tracking.
-- Token artwork selection uses Foundry V14's native FilePicker. The module links to image paths stored in Foundry, rather than duplicating or embedding image files.
-- JavaScript, artwork selection, save/load, and simulated GM/player permission checks have been run outside Foundry. Verify layout, file browser, and image access with real Foundry V14 GM and player clients as well.
+- Token artwork selection uses Foundry V11's native FilePicker. The module links to image paths stored in Foundry, rather than duplicating or embedding image files.
+- Automated V11 API-shape, artwork selection, save/delete, and GM/player permission checks are run against simulated APIs. Real Foundry V11 GM and player testing remains necessary.
+
+## Upgrade notes
+
+v1.4.0 targets **Foundry V11 exclusively**. It retains the module ID `averis-highest-dmg` and the world setting `records`, so existing records and artwork paths stay in place when upgrading the module in the same world. No conversion from Foundry V14 worlds to V11 is supported; Foundry worlds themselves should not be downgraded. The older Foundry V14 code remains available under the `v1.3.0` release.
