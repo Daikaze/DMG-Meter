@@ -5,6 +5,15 @@ on:
     branches: [main]
     paths:
       - module.json
+  pull_request:
+    branches: [main]
+    paths:
+      - module.json
+      - "scripts/**"
+      - "styles/**"
+      - "templates/**"
+      - "tests/**"
+      - ".github/workflows/release.yml"
   workflow_dispatch:
 
 permissions:
@@ -16,6 +25,12 @@ jobs:
     steps:
       - name: Check out module
         uses: actions/checkout@v4
+
+      - name: Validate JavaScript and applied-damage regression tests
+        run: |
+          node --check scripts/highest-dmg.js
+          node --check scripts/auto-tracker.js
+          node --test tests/*.test.mjs
 
       - name: Build Foundry-installable ZIP
         id: package
@@ -41,6 +56,12 @@ jobs:
           for file in files:
               if not os.path.isfile(file):
                   raise FileNotFoundError(file)
+          manifest = json.load(open("module.json", encoding="utf-8"))
+          tag = "v" + manifest["version"]
+          assert manifest["download"] == f"https://github.com/Daikaze/DMG-Meter/releases/download/{tag}/averis-highest-dmg-{tag}.zip"
+          assert manifest["compatibility"]["verified"] == "14"
+          systems = manifest["relationships"]["systems"]
+          assert any(s["id"] == "dnd5e" and s["compatibility"]["verified"] == "6.0.6" for s in systems)
           filename = f"dist/averis-highest-dmg-v{version}.zip"
           with zipfile.ZipFile(filename, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
               for file in files:
@@ -49,6 +70,7 @@ jobs:
           PY
 
       - name: Publish GitHub Release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
