@@ -1,6 +1,6 @@
 /**
  * Averis | Highest DMG — Foundry VTT V14.
- * Records are manual only; no encounter or automatic damage tracking.
+ * Records are manually editable, with optional post-applied damage tracking.
  * No global CSS, document monkey-patching, or core UI overrides.
  */
 const MODULE_ID = "averis-highest-dmg";
@@ -58,6 +58,8 @@ class HighestDmgApp extends HandlebarsApplicationMixin(ApplicationV2) {
     window: {
       title: "Averis | Highest DMG",
       icon: "fa-solid fa-trophy",
+      frame: true,
+      minimizable: true,
       resizable: true
     },
     position: { width: 770, height: 680 }
@@ -392,6 +394,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
   const order = Math.max(0, ...orders) + 1;
   const name = "averisHighestDmg";
 
+  if (controls[name]) return; // Avoid overwriting an existing scene control.
   controls[name] = {
     name,
     title: "Highest DMG",

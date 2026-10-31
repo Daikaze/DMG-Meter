@@ -1,8 +1,17 @@
-# Averis | Highest DMG (v1.6.0 — Foundry V14)
+# Averis | Highest DMG (v1.6.1 — Foundry V14)
 
-**Foundry VTT v14** · D&D 5e 5.3.3 compatible.
+**Foundry VTT v14** · **D&D 5e 6.0.6** target.
 
-A dark gold-accented **Highest DMG** leaderboard for your Averis campaign. The board begins empty and contains just **one category: highest single-hit damage**. There are no sample characters, example encounters, or automatic damage calculations.
+A native Foundry-styled **Highest DMG** leaderboard for your Averis campaign. The board begins empty and contains just **one category: highest single-hit damage**. There are no sample characters, example encounters, or automatic damage calculations.
+
+## v1.6.1 — Native Foundry V14 UI & test coverage
+
+- Replaces the fixed custom dark/gold leaderboard design with **Foundry theme-aware controls**, typography and panels.
+- Native `ApplicationV2` title bar, resizing and double-click minimization. Layout responds to the **window width**.
+- No modifications to actor sheets, token HUD or other module styles.
+- Keeps the same world-setting records, manual GM editing, player read-only access, player portraits and optional post-apply tracking.
+- Adds automated tests for real applied damage, ignoring healing/NPC/self-damage, MIDI vs D&D hook deduplication, and attribution checks on remote events.
+- Tracking still requires actual in-world validation with the specific D&D5e/Midi-QOL configuration.
 
 ## Installation
 
@@ -47,7 +56,7 @@ game.modules.get("averis-highest-dmg").api.open();
 - Uses the Foundry v14 ApplicationV2 and Handlebars APIs.
 - Manual Highest DMG stays available. Automatic tracking is optional and supports D&D 5e's post-apply hook and Midi-QOL's post-damage hook (if installed).
 - Token artwork selection uses Foundry V14's native FilePicker. The module links to image paths stored in Foundry, rather than duplicating or embedding image files.
-- JavaScript syntax and simulated damage-application checks can be run outside Foundry. Actual Foundry V14 + D&D5e 5.3.3 / Midi-QOL in-session testing is still necessary.
+- JavaScript syntax and simulated damage-application checks can be run outside Foundry. Actual Foundry V14 + D&D5e 6.0.6 / Midi-QOL in-session testing is still necessary.
 
 ## Restored configuration
 

@@ -1,29 +1,26 @@
 <section class="averis-hdmg">
   <header class="averis-hdmg__banner">
-    <div class="averis-hdmg__meta">
-      <span class="averis-hdmg__brand">✦ AVERIS · CAMPAIGN RECORDS</span>
-      <span class="averis-hdmg__view"><i class="fa-solid {{#if canEdit}}fa-shield-halved{{else}}fa-eye{{/if}}" aria-hidden="true"></i> {{#if canEdit}}GM VIEW{{else}}PLAYER VIEW{{/if}}</span>
-    </div>
-    <h1>Damage Hall of Fame</h1>
-    <p>The heroes who delivered the strongest single hit.</p>
+    <h1>Highest Damage</h1>
+    <span class="averis-hdmg__view"><i class="fa-solid {{#if canEdit}}fa-shield-halved{{else}}fa-eye{{/if}}" aria-hidden="true"></i> {{#if canEdit}}GM Controls{{else}}Read Only{{/if}}</span>
+    <p>Highest single hit per character — applied damage only.</p>
   </header>
 
   <div class="averis-hdmg__content">
     <div class="averis-hdmg__grid">
       <section class="averis-hdmg__hero" aria-label="Highest damage record">
-        <div class="averis-hdmg__eyebrow"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> HIGHEST DMG</div>
+        <div class="averis-hdmg__eyebrow"><i class="fa-solid fa-trophy" aria-hidden="true"></i> Record Holder</div>
         {{#if leader}}
           <div class="averis-hdmg__hero-identity">
             {{#if leader.img}}
               <img class="averis-hdmg__hero-art" src="{{leader.img}}" alt="{{leader.name}} portrait">
             {{/if}}
             <div>
-              <div class="averis-hdmg__label">♛ Current Record Holder</div>
+              <div class="averis-hdmg__label">Highest Single Hit</div>
               <h2>{{leader.name}}</h2>
             </div>
           </div>
           <div class="averis-hdmg__hero-number">{{leader.displayDamage}} <small>DMG</small></div>
-          <div class="averis-hdmg__hero-bottom"><i class="fa-solid fa-star" aria-hidden="true"></i> #1 IN CAMPAIGN</div>
+          <div class="averis-hdmg__hero-bottom">Campaign record</div>
         {{else}}
           <div class="averis-hdmg__empty-hero">
             <i class="fa-solid fa-trophy" aria-hidden="true"></i>
